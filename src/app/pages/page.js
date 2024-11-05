@@ -13,7 +13,7 @@ export default function HomePage() {
       <p className="text-lg text-center text-white mb-6">
         Safe, Healthy, Stylish, and Professional
       </p>
-      <Link href="/pages/user">
+      <Link href="/pages/login">
         <button className="bg-black text-white px-6 py-3 rounded-lg border shadow-lg hover:bg-indigo-700 transition duration-300 ">
           Submit Work Order
         </button>
