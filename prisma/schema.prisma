@@ -1,0 +1,61 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+
+
+model bb_users {
+  USER_ID                   Int         @id @default(autoincrement())
+  DISPLAY_NAME              String?
+  USER_NAME                 String      @unique
+  PASSWORD                  String
+  EMAIL                     String?     @unique
+  IS_DELETED                Int?
+  devicePushToken           String?
+  profileImage              String?
+  IS_READ_ONLY              String?
+
+  projects                  bb_projects[]  @relation("UserProjects")
+}
+
+
+model bb_projects {
+  PROJECT_ID                Int       @id @default(autoincrement())
+  PROJECT                   String
+  IS_SORT_FIRST             Int
+  ABBREVIATION              String
+  CREATE_WO_EMAIL_TO        String
+  M_LOCATION                String
+
+
+  users                     bb_users[] @relation("UserProjects")
+}
+
+
+
+model bb_wo {
+  WO_ID                    String      @id
+  WO_DUEDATE               DateTime?
+  WO_NUMBER                Int         @default(autoincrement())
+  PROJECT                  String
+  WO_TITLE                 String?
+  WO_DESC                  String?
+  WO_STATUS                String?
+  WO_PRIORITY              String?
+  ASSIGNED_TO              String
+  ASSIGNED_DATE            DateTime
+  CRE_BY                   String?
+  CRE_DT                   DateTime?
+  IS_DELETED               Int?
+}
