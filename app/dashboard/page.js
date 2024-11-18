@@ -4,14 +4,20 @@ import { signOut, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import SideNavbar from "@/app/component/SideNavbar";
+import WorkOderModal from "@/app/component/WorkOrderModal"; //
 
 const DashboardPage = () => {
   const { data: session, status } = useSession(); // Get session status and session data
   const router = useRouter();
   const [workorders, setWorkOrder] = useState([]);
+  const [workOrderHistory, setWorkOrderHistory] = useState([]);
   const [totalWorkOrders, setTotalWorkOrders] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
+
+  // Modal state
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedWorkOrder, setSelectedWorkOrder] = useState(null);
 
   const fetchWorkOrders = async (page = 1) => {
     try {
@@ -52,6 +58,27 @@ const DashboardPage = () => {
     if (page < 1 || page > totalPages) return; // Prevent invalid page numbers
     setCurrentPage(page);
     fetchWorkOrders(page);
+  };
+
+  const handleViewClick = async (woNumber) => {
+    try {
+      const res = await fetch(`/api/workOrderHistory?WO_NUMBER=${woNumber}`);
+      const data = await res.json();
+      if (res.ok) {
+        setSelectedWorkOrder(data);
+        setIsModalOpen(true);
+        setWorkOrderHistory(data.wo);
+      } else {
+        console.error("Failed to load work order details", data.error);
+      }
+    } catch (error) {
+      console.error("Error fetching work order details", error);
+    }
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setSelectedWorkOrder(null);
   };
 
   if (status === "loading") {
@@ -105,7 +132,12 @@ const DashboardPage = () => {
               ) : (
                 workorders.map((workorder) => (
                   <tr key={workorder.WO_NUMBER}>
-                    <td className="border px-4 py-2">View</td>
+                    <td
+                      className="border px-4 py-2 text-blue-500 cursor-pointer"
+                      onClick={() => handleViewClick(workorder.WO_NUMBER)}
+                    >
+                      View
+                    </td>
                     <td className="border px-4 py-2">{workorder.PROJECT}</td>
                     <td className="border px-4 py-2">{workorder.WO_TYPE}</td>
                     <td className="border px-4 py-2">{workorder.WO_NUMBER}</td>
@@ -141,6 +173,11 @@ const DashboardPage = () => {
           </div>
         </div>
       </div>
+      <WorkOderModal
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+        workOrderDetails={workOrderHistory}
+      />
     </div>
   );
 };

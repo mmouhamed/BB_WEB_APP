@@ -48,9 +48,6 @@ export const authOptions = {
   },
   callbacks: {
     async jwt({ token, user }) {
-      console.log("IN TOKEN:::::::::::");
-      console.log("Token USER", user);
-      console.log("TOKEN TOKEN", token);
       token.iat = Date.now();
 
       const now = Date.now();
@@ -67,4 +64,3 @@ export const authOptions = {
     },
   },
 };
-
